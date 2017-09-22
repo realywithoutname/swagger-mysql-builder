@@ -9,7 +9,7 @@ const db = knex(config.get('database'))
 const checkTable = function ({name, model}) {
   let properties = model.properties
   let required = model.required || []
-  let tableName = _.lowerCase(name)
+  let tableName = _.snakeCase(name)
 
   required.forEach(prop => properties[prop].required = true)
   return db.schema.hasTable(tableName).then(
