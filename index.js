@@ -87,9 +87,14 @@ module.exports = function ({ definitions }, ismiddle) {
     .then(() => { isLoaded = true })
     .catch(err => { throw err })
 
-  return ismiddle ? function () {
+  const fn = function () {
     let req = isKoa(this, arguments) ? (this === global ? arguments[0] : this) : arguments[0]
     req.db = db
     arguments[arguments.length - 1]()
-  } : db
+    return new Promise(resolve => {
+      resolve(arguments[arguments.length - 1]())
+    })
+  }
+
+  return ismiddle ? fn : db
 }

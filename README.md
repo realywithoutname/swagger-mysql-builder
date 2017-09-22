@@ -21,7 +21,9 @@ The demo can be find [here](https://github.com/realywithoutname/decorator-doc/tr
 ### api
 - builder(Object: swaggerJSON, Boolean: asMiddleware)
   - swaggerJSON `required` general swagger.json.
-  - asMiddleare `optional` return will used to middleware. if `true`, return a function. otherwise return a knex instance.
+  - asMiddleware `optional` return will used to middleware. if `true`, return a function. otherwise return a knex instance.
+
+> koa 1.x can't use as middleware, so `asMiddleware` argument is invalid.
 
 The builder will get database  configure use [config](https://github.com/lorenwest/node-config). like
 ~~~ javascript
