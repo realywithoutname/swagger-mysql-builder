@@ -62,7 +62,7 @@ module.exports = function ({ definitions }, client) {
   }
   db = client
   definitions = Object.keys(definitions).map((name) => {
-    if (definitions[name] && !definitions[name].additional)
+    if (definitions[name] && !definitions[name]['x-additional'])
       return checkTable({ name, model: definitions[name] })
     else
       return Promise.resolve(true)
