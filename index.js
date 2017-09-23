@@ -1,10 +1,8 @@
-const config = require('config')
-const knex = require('knex')
 const _ = require('lodash')
 const colors = require('colors')
 const debug = require('debug')('db')
 
-const db = knex(config.get('database'))
+let db = null
 
 const checkTable = function ({name, model}) {
   let properties = model.properties
@@ -56,26 +54,13 @@ const createTable = function (name, props) {
   }).catch(err => console.log(err))
 }
 
-function isKoa (caller, args) {
-  let ctx = caller === global ? args[0] : caller
-  let { res, req } = ctx
-  let isKoa = true
-
-  if (args.length > 2) {
-    req = args[0]
-    res = args[1]
-    isKoa = false
-  }
-
-  if (res.constructor.name !== 'ServerResponse' || req.constructor.name === 'ServerRequest')
-    throw new Error('Invaild Request.')
-
-  return isKoa
-}
-
-module.exports = function ({ definitions }, ismiddle) {
+module.exports = function ({ definitions }, client) {
   let isLoaded = false
 
+  if (!client) {
+    throw new Error('The argument db miss.')
+  }
+  db = client
   definitions = Object.keys(definitions).map((name) => {
     if (definitions[name] && !definitions[name].additional)
       return checkTable({ name, model: definitions[name] })
@@ -86,14 +71,7 @@ module.exports = function ({ definitions }, ismiddle) {
   Promise.all(definitions)
     .then(() => { isLoaded = true })
     .catch(err => { throw err })
-
-  const fn = function () {
-    let req = isKoa(this, arguments) ? (this === global ? arguments[0] : this) : arguments[0]
-    req.db = db
-    return new Promise(resolve => {
-      resolve(arguments[arguments.length - 1]())
+    .then(() => {
+      console.log(colors.blue('Database check finished!!!'))
     })
-  }
-
-  return ismiddle ? fn : db
 }
